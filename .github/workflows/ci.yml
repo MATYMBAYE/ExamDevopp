@@ -36,3 +36,21 @@ jobs:
           image-ref: docker.io/${{ secrets.DOCKER_USERNAME }}/html-app:latest
           severity: HIGH,CRITICAL
           exit-code: '1'
+          deploy:
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+      - name: Pull image
+        run: docker pull docker.io/${{ secrets.DOCKER_USERNAME }}/html-app:latest
+
+      - name: Stop container
+        run: docker stop html-container || true
+
+      - name: Remove container
+        run: docker rm html-container || true
+
+      - name: Run container
+        run: |
+          docker run -d -p 80:80 --name html-container \
+          docker.io/${{ secrets.DOCKER_USERNAME }}/html-app:latest
